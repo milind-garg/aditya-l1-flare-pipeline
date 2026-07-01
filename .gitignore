@@ -16,7 +16,7 @@ __pycache__/
 
 # Data and Models
 data/raw/
-data/processed/
+data/processed/*
 *.zip
 *.pkl
 *.csv
