@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, HTTPException
 from datetime import datetime
 from pathlib import Path
 import pandas as pd
@@ -62,3 +62,46 @@ async def get_forecast(
         alert_30min=filtered["alert_30min"].tolist() if "alert_30min" in filtered.columns else [],
         lead_time_minutes=15,
     )
+
+
+@router.post("/ingest/poll")
+async def poll_ingest():
+    """Trigger simulated ISSDC PRADAN portal ingestion."""
+    try:
+        from src.ingest.pradan_watcher import poll_pradan_api
+        status = poll_pradan_api(force_new_data=True)
+        
+        # Clear timeseries, flares, and forecast memory caches
+        from backend.routers import timeseries, flares
+        global _forecast_cache
+        _forecast_cache = None
+        timeseries._timeseries_cache = None
+        flares._flares_cache = None
+        
+        # Reload caches immediately
+        timeseries.load_timeseries()
+        flares.load_flares()
+        load_forecast()
+        
+        return status
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/ingest/status")
+async def get_ingest_status():
+    """Retrieve simulated PRADAN sync status."""
+    import json
+    from src.ingest.pradan_watcher import INGESTION_LOG_PATH
+    if not INGESTION_LOG_PATH.exists():
+        return {
+            "last_sync_timestamp": None,
+            "new_data_found": False,
+            "downloaded_files": [],
+            "pipeline_success": False
+        }
+    try:
+        with open(INGESTION_LOG_PATH, "r") as f:
+            return json.load(f)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

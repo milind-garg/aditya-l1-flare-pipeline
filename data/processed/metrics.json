@@ -9,7 +9,7 @@
   "forecast": {
     "tpr": 0.044444444444444446,
     "far": 0.978494623655914,
-    "roc_auc": 0.7842427798422322,
+    "roc_auc": 0.785377773433682,
     "best_threshold": 0.05,
     "threshold": 0.05,
     "precision": 0.021505376344086023,
@@ -17,7 +17,7 @@
     "true_positives": 4,
     "false_positives": 182,
     "false_negatives": 86,
-    "true_negatives": 10044,
+    "true_negatives": 10049,
     "lead_time_minutes": {
       "median": 0.0,
       "mean": 0.0,

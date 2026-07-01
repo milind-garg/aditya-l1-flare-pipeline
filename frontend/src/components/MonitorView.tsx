@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   AreaChart,
   Area,
@@ -9,6 +10,8 @@ import {
   ReferenceLine,
 } from "recharts";
 import type { FlareEvent } from "../api/client";
+import { pollIngest, getIngestStatus } from "../api/client";
+import type { IngestStatusResponse } from "../api/client";
 
 
 interface GaugeForecast {
@@ -65,6 +68,42 @@ export default function MonitorView({
   onPause,
   onSpeedChange,
 }: MonitorViewProps) {
+
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<IngestStatusResponse | null>(null);
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    getIngestStatus()
+      .then(setSyncStatus)
+      .catch((err) => console.error("Failed to load PRADAN status:", err));
+  }, []);
+
+  const handleSync = async () => {
+    setIsSyncing(true);
+    setSyncMessage("Polling ISSDC PRADAN portal...");
+    try {
+      const res = await pollIngest();
+      setSyncStatus({
+        last_sync_timestamp: res.timestamp,
+        new_data_found: res.new_data_found,
+        downloaded_files: res.downloaded_files,
+        pipeline_success: res.success,
+      });
+      if (res.new_data_found) {
+        setSyncMessage("New telemetry ingested & processed successfully!");
+        onTimeRangeChange(timeRange[0], timeRange[1]);
+      } else {
+        setSyncMessage("Telemetry is already up to date.");
+      }
+    } catch (err: any) {
+      console.error(err);
+      setSyncMessage(`Sync failed: ${err.message || err}`);
+    } finally {
+      setIsSyncing(false);
+      setTimeout(() => setSyncMessage(null), 5000);
+    }
+  };
 
   const softData = timeSeries.map((d) => ({
     ts: new Date(d.timestamp).getTime(),
@@ -364,6 +403,58 @@ export default function MonitorView({
                     <span className="text-label-caps text-[10px] text-on-surface-variant">30-MIN WINDOW</span>
                   </div>
                 </div>
+              </div>
+
+              {/* ISSDC PRADAN Sync Widget */}
+              <div className="glass-panel rounded-lg p-6 flex flex-col gap-4 shrink-0">
+                <h3 className="text-label-caps font-label-caps text-secondary border-b border-outline-variant/30 pb-2 flex justify-between items-center">
+                  <span>ISSDC PRADAN SYNC</span>
+                  <span className={`w-2 h-2 rounded-full ${syncStatus?.last_sync_timestamp ? "bg-emerald-500" : "bg-gray-500"}`} />
+                </h3>
+                <div className="flex flex-col gap-2 text-[11px] text-on-surface-variant">
+                  <div className="flex justify-between">
+                    <span>API Connection:</span>
+                    <span className="text-emerald-400 font-semibold">ONLINE</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Last Ingested Sync:</span>
+                    <span className="text-primary font-mono">
+                      {syncStatus?.last_sync_timestamp 
+                        ? new Date(syncStatus.last_sync_timestamp).toLocaleTimeString() 
+                        : "Never"}
+                    </span>
+                  </div>
+                  {syncStatus?.downloaded_files && syncStatus.downloaded_files.length > 0 && (
+                    <div className="flex flex-col gap-1 mt-1 border-t border-outline-variant/10 pt-2">
+                      <span className="text-[10px] uppercase text-on-surface-variant/70">Last Received Files:</span>
+                      {syncStatus.downloaded_files.map((file, i) => (
+                        <span key={i} className="text-[10px] font-mono text-sky-400 truncate">{file}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <button
+                  className="w-full bg-primary/20 border border-primary text-primary hover:bg-primary/30 transition-colors py-2 rounded text-label-caps font-semibold flex items-center justify-center gap-2 mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={handleSync}
+                  disabled={isSyncing}
+                >
+                  {isSyncing ? (
+                    <>
+                      <span className="material-symbols-outlined animate-spin text-sm">sync</span>
+                      <span>SYNCING TELEMETRY...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="material-symbols-outlined text-sm">download</span>
+                      <span>SYNC PRADAN TELEMETRY</span>
+                    </>
+                  )}
+                </button>
+                {syncMessage && (
+                  <div className="text-[10px] text-emerald-400 text-center animate-pulse mt-1">
+                    {syncMessage}
+                  </div>
+                )}
               </div>
 
               {/* Replay controls */}

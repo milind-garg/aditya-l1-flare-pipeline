@@ -98,4 +98,31 @@ export function createReplayWebSocket(
   return new WebSocket(`${protocol}//${host}/api/ws/replay?${params}`);
 }
 
+export interface IngestStatusResponse {
+  last_sync_timestamp: string | null;
+  new_data_found: boolean;
+  downloaded_files: string[];
+  pipeline_success: boolean;
+}
+
+export interface IngestPollResponse {
+  success: boolean;
+  new_data_found: boolean;
+  downloaded_files: string[];
+  pipeline_status: any;
+  timestamp: string;
+}
+
+export async function pollIngest(): Promise<IngestPollResponse> {
+  const res = await fetch(`${API_BASE}/ingest/poll`, { method: "POST" });
+  if (!res.ok) throw new Error(`Ingest sync failed: ${res.statusText}`);
+  return res.json();
+}
+
+export async function getIngestStatus(): Promise<IngestStatusResponse> {
+  const res = await fetch(`${API_BASE}/ingest/status`);
+  if (!res.ok) throw new Error(`Failed to load ingest status: ${res.statusText}`);
+  return res.json();
+}
+
 export type { TimeSeriesData, FlareEvent, FlareResponse, ForecastResponse, EvaluationResponse };
