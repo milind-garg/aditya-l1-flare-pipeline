@@ -21,5 +21,15 @@ data/processed/
 *.pkl
 *.csv
 
+# Unignore project-essential data & models
+!models/forecast_model_15min.pkl
+!models/forecast_model_30min.pkl
+!models/scaler_15min.pkl
+!models/scaler_30min.pkl
+!data/processed/combined_timeseries.parquet
+!data/processed/forecast_scores.parquet
+!data/processed/flare_catalogue_master.csv
+!data/processed/metrics.json
+
 # OS
 .DS_Store
