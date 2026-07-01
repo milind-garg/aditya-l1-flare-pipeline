@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Aditya-L1 Solar Flare Monitor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "background": "#131314",
+                      "error": "#ffb4ab",
+                      "surface-container-high": "#2a2a2b",
+                      "tertiary-fixed-dim": "#dbc3a8",
+                      "secondary-fixed-dim": "#c0c6db",
+                      "surface-container-low": "#1c1b1c",
+                      "primary": "#c3c6d7",
+                      "secondary-container": "#404758",
+                      "primary-container": "#0a0e1a",
+                      "on-background": "#e5e2e3",
+                      "surface-variant": "#353436",
+                      "primary-fixed-dim": "#c3c6d7",
+                      "secondary": "#c0c6db",
+                      "inverse-on-surface": "#313031",
+                      "on-primary": "#2c303d",
+                      "on-tertiary-fixed-variant": "#544430",
+                      "surface": "#131314",
+                      "on-error": "#690005",
+                      "surface-container-lowest": "#0e0e0f",
+                      "on-primary-fixed": "#171b28",
+                      "tertiary-fixed": "#f8dec3",
+                      "on-tertiary-container": "#8c7861",
+                      "on-surface-variant": "#c7c6cc",
+                      "outline-variant": "#46464c",
+                      "on-primary-fixed-variant": "#434654",
+                      "on-secondary-fixed": "#141b2b",
+                      "secondary-fixed": "#dce2f7",
+                      "surface-dim": "#131314",
+                      "error-container": "#93000a",
+                      "on-secondary": "#293040",
+                      "on-tertiary": "#3c2e1b",
+                      "outline": "#909096",
+                      "tertiary-container": "#170c01",
+                      "surface-container-highest": "#353436",
+                      "inverse-surface": "#e5e2e3",
+                      "on-tertiary-fixed": "#261908",
+                      "on-secondary-fixed-variant": "#404758",
+                      "inverse-primary": "#5a5e6d",
+                      "surface-tint": "#c3c6d7",
+                      "surface-bright": "#3a393a",
+                      "on-secondary-container": "#aeb5c9",
+                      "surface-container": "#201f20",
+                      "tertiary": "#dbc3a8",
+                      "primary-fixed": "#dfe2f3",
+                      "on-error-container": "#ffdad6",
+                      "on-primary-container": "#777b8a",
+                      "on-surface": "#e5e2e3",
+                      "solar-amber": "#ffbf00",
+                      "flare-c": "#facc15",
+                      "flare-m": "#f97316",
+                      "flare-x": "#ef4444"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "gutter": "16px",
+                      "container-padding": "12px",
+                      "margin-page": "24px",
+                      "unit": "4px"
+              },
+              "fontFamily": {
+                      "body-md": ["JetBrains Mono"],
+                      "display-lg": ["Inter"],
+                      "mono-sm": ["JetBrains Mono"],
+                      "headline-md": ["Inter"],
+                      "data-lg": ["JetBrains Mono"],
+                      "label-caps": ["JetBrains Mono"]
+              },
+              "fontSize": {
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "mono-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "data-lg": ["20px", {"lineHeight": "28px", "fontWeight": "500"}],
+                      "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        body { background-color: #0a0e1a; color: #e5e2e3; font-family: 'JetBrains Mono', monospace; }
+        .glass-panel { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .flare-gradient-c { background: linear-gradient(to bottom, transparent, rgba(250, 204, 21, 0.15), transparent); }
+        .flare-gradient-m { background: linear-gradient(to bottom, transparent, rgba(249, 115, 22, 0.15), transparent); }
+        .flare-gradient-x { background: linear-gradient(to bottom, transparent, rgba(239, 68, 68, 0.15), transparent); }
+        .pulse-dot { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+        .glow-amber { box-shadow: 0 0 15px rgba(255, 191, 0, 0.3); }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #0a0e1a; }
+        ::-webkit-scrollbar-thumb { background: #46464c; }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-background/80 backdrop-blur-md border-b border-outline-variant/15">
+<div class="flex items-center gap-4">
+<h1 class="text-headline-md font-headline-md font-bold tracking-tight text-primary">Aditya-L1 Solar Flare Monitor</h1>
+</div>
+<div class="flex items-center gap-8 font-label-caps text-label-caps uppercase tracking-widest">
+<div class="flex items-center gap-2 text-emerald-400">
+<span class="w-2 h-2 rounded-full bg-emerald-400 pulse-dot"></span>
+<span>L1 Connection: Active</span>
+</div>
+<div class="text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span id="utc-clock">UTC 12:45:00</span>
+</div>
+</div>
+</header>
+<!-- SideNavBar (Ghost Sidebar for Shell requirement) -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-16 md:w-64 z-40 flex flex-col py-4 bg-surface-container-lowest border-r border-outline-variant/15">
+<div class="px-6 mb-8 hidden md:block">
+<p class="text-label-caps font-label-caps text-secondary">Mission Operator</p>
+<p class="text-body-md font-body-md text-on-surface-variant">Vigilance Level: High</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-4 px-6 py-3 text-primary bg-primary-container/10 border-r-2 border-primary transition-transform active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="hidden md:inline font-label-caps text-label-caps">Telemetry</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant hover:bg-surface-variant/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">wb_sunny</span>
+<span class="hidden md:inline font-label-caps text-label-caps">Solar Map</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant hover:bg-surface-variant/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">warning</span>
+<span class="hidden md:inline font-label-caps text-label-caps">Flare Log</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant hover:bg-surface-variant/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="hidden md:inline font-label-caps text-label-caps">Mission Logs</span>
+</a>
+</nav>
+<div class="mt-auto px-6 py-4">
+<a class="flex items-center gap-4 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="hidden md:inline font-label-caps text-label-caps">Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-16 md:ml-64 mt-16 flex-1 flex flex-col relative overflow-hidden bg-background">
+<!-- Alert Banner -->
+<div class="w-full bg-solar-amber/20 border-y border-solar-amber/30 px-6 py-3 flex items-center justify-center gap-4 glow-amber z-10">
+<span class="material-symbols-outlined text-solar-amber animate-pulse">warning</span>
+<p class="text-solar-amber font-label-caps text-label-caps tracking-widest text-center">
+                FLARE ALERT — C4.2 class flare predicted in next 12 minutes — 78% confidence
+            </p>
+<span class="material-symbols-outlined text-solar-amber animate-pulse">warning</span>
+</div>
+<div class="flex-1 flex p-gutter gap-gutter overflow-hidden">
+<!-- Main Viewport (70% width) -->
+<section class="w-[70%] flex flex-col gap-gutter h-full">
+<div class="flex-1 glass-panel rounded-lg p-container-padding flex flex-col relative">
+<!-- Chart Headers -->
+<div class="flex justify-between items-center mb-2 px-2">
+<span class="text-label-caps text-sky-400 font-bold">SOFT X-RAY (SOLEXS)</span>
+<div class="flex gap-4 text-[10px] text-on-surface-variant">
+<span>0.1-0.8 nm</span>
+<span>Scale: Logarithmic</span>
+</div>
+</div>
+<!-- Top Chart Panel -->
+<div class="flex-1 relative overflow-hidden group border-b border-outline-variant/30">
+<!-- Shaded Regions Simulation -->
+<div class="absolute left-[20%] w-[5%] h-full flare-gradient-c border-x border-flare-c/20"></div>
+<div class="absolute left-[45%] w-[8%] h-full flare-gradient-m border-x border-flare-m/20"></div>
+<div class="absolute left-[80%] w-[3%] h-full flare-gradient-x border-x border-flare-x/20"></div>
+<!-- Line Graph Placeholder -->
+<svg class="absolute inset-0 w-full h-full" preserveaspectratio="none" viewbox="0 0 1000 200">
+<path d="M0,150 L100,140 L200,80 L250,120 L300,110 L400,140 L450,40 L530,130 L600,140 L700,150 L800,20 L830,140 L1000,150" fill="none" stroke="#38bdf8" stroke-width="2"></path>
+<circle cx="200" cy="80" fill="#38bdf8" r="3"></circle>
+<circle cx="450" cy="40" fill="#38bdf8" r="3"></circle>
+<circle cx="800" cy="20" fill="#38bdf8" r="3"></circle>
+</svg>
+<!-- Grid Lines -->
+<div class="absolute inset-0 grid grid-rows-4 pointer-events-none opacity-10">
+<div class="border-b border-white"></div>
+<div class="border-b border-white"></div>
+<div class="border-b border-white"></div>
+</div>
+</div>
+<!-- Bottom Chart Panel -->
+<div class="flex justify-between items-center mt-4 mb-2 px-2">
+<span class="text-label-caps text-flare-m font-bold">HARD X-RAY (HEL1OS)</span>
+<div class="flex gap-4 text-[10px] text-on-surface-variant">
+<span>10-150 keV</span>
+<span>Sampling: 1s</span>
+</div>
+</div>
+<div class="flex-1 relative overflow-hidden group">
+<!-- Shaded Regions Simulation -->
+<div class="absolute left-[20%] w-[5%] h-full flare-gradient-c border-x border-flare-c/20"></div>
+<div class="absolute left-[45%] w-[8%] h-full flare-gradient-m border-x border-flare-m/20"></div>
+<div class="absolute left-[80%] w-[3%] h-full flare-gradient-x border-x border-flare-x/20"></div>
+<!-- Line Graph Placeholder -->
+<svg class="absolute inset-0 w-full h-full" preserveaspectratio="none" viewbox="0 0 1000 200">
+<path d="M0,160 L180,155 L200,120 L220,150 L420,160 L450,90 L480,150 L750,160 L800,60 L850,150 L1000,165" fill="none" stroke="#f97316" stroke-width="2"></path>
+</svg>
+<!-- Grid Lines -->
+<div class="absolute inset-0 grid grid-rows-4 pointer-events-none opacity-10">
+<div class="border-b border-white"></div>
+<div class="border-b border-white"></div>
+<div class="border-b border-white"></div>
+</div>
+</div>
+<!-- X-Axis -->
+<div class="h-8 w-full mt-2 flex justify-between items-center px-4 border-t border-outline-variant/30 text-[10px] text-on-surface-variant font-mono-sm">
+<span>12:00</span>
+<span>12:10</span>
+<span>12:20</span>
+<span>12:30</span>
+<span>12:40</span>
+<span class="text-flare-x font-bold">NOW</span>
+<span>13:00</span>
+</div>
+</div>
+</section>
+<!-- Right Sidebar (30% width) -->
+<aside class="w-[30%] flex flex-col gap-gutter">
+<!-- Forecast Probability Card -->
+<div class="glass-panel rounded-lg p-6 flex flex-col gap-4">
+<h3 class="text-label-caps font-label-caps text-secondary border-b border-outline-variant/30 pb-2">FORECAST PROBABILITY</h3>
+<div class="flex justify-around items-center py-4">
+<!-- Gauge 1 -->
+<div class="flex flex-col items-center gap-2">
+<div class="relative w-24 h-24">
+<svg class="w-full h-full" viewbox="0 0 36 36">
+<path class="stroke-current text-surface-variant opacity-20" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-width="3"></path>
+<path class="stroke-current text-flare-x" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-dasharray="78, 100" stroke-linecap="round" stroke-width="3"></path>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-data-lg font-data-lg text-flare-x">78%</span>
+</div>
+</div>
+<span class="text-label-caps text-[10px] text-on-surface-variant">15-MIN WINDOW</span>
+</div>
+<!-- Gauge 2 -->
+<div class="flex flex-col items-center gap-2">
+<div class="relative w-24 h-24">
+<svg class="w-full h-full" viewbox="0 0 36 36">
+<path class="stroke-current text-surface-variant opacity-20" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-width="3"></path>
+<path class="stroke-current text-flare-c" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-dasharray="45, 100" stroke-linecap="round" stroke-width="3"></path>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-data-lg font-data-lg text-flare-c">45%</span>
+</div>
+</div>
+<span class="text-label-caps text-[10px] text-on-surface-variant">30-MIN WINDOW</span>
+</div>
+</div>
+</div>
+<!-- Replay Controls Card -->
+<div class="glass-panel rounded-lg p-6 flex flex-col gap-6">
+<h3 class="text-label-caps font-label-caps text-secondary border-b border-outline-variant/30 pb-2">MISSION REPLAY CONTROLS</h3>
+<div class="flex items-center gap-4">
+<button class="w-12 h-12 flex items-center justify-center rounded-full border border-primary text-primary hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined">play_arrow</span>
+</button>
+<div class="flex-1">
+<div class="flex justify-between mb-1">
+<span class="text-[10px] text-on-surface-variant">TIMELINE PROGRESS</span>
+<span class="text-[10px] text-primary">LIVE</span>
+</div>
+<div class="w-full bg-surface-variant/30 h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[85%]"></div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-1">
+<label class="text-[10px] text-on-surface-variant uppercase tracking-tighter">Playback Speed</label>
+<select class="bg-primary-container text-body-md font-body-md border border-outline-variant/30 rounded px-2 py-1 focus:ring-0 focus:border-primary">
+<option>1x (Realtime)</option>
+<option>10x</option>
+<option>60x</option>
+</select>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-[10px] text-on-surface-variant uppercase tracking-tighter">Date Range</label>
+<button class="bg-primary-container text-body-md font-body-md border border-outline-variant/30 rounded px-2 py-1 text-left flex items-center justify-between">
+<span>Mar 1–5</span>
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Live Sun Feed (Visual Interest) -->
+<div class="flex-1 glass-panel rounded-lg overflow-hidden relative group">
+<img class="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity" data-alt="Close up scientific high resolution footage of the sun's surface showing magnetic field loops and glowing plasma flares. Dark navy and high contrast solar orange colors. Technical UI overlays and scanning lines across the image to simulate a mission control video feed." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUCen_DAVZNYMfReGKywr_f1qkj4uZH5MnBdDNglaBwkMsRTWbxvWGK4SHJ61TgCqsk7fuYR30QcRRMiNOD53J4JoiwHWVKmesf7A_FqF89rGQGM4qE4w7uDTJ4ErZtEzr7XeLLwQmwsrUfOLj4DQ3Dl54dJgiaq4jhE_QrOGeAU-ZbcndtLcr5Yl9t8dkEpw3-YFHjEa_KpA8LFqp2GAD_JSaRsn_1gDhX0n89wVjFx3nnS_mhX28S3u5HAx8wQWVmFuiuU7IAKYr"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+<div class="absolute top-4 left-4 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-flare-x animate-pulse"></span>
+<span class="text-[10px] font-bold text-flare-x">LIVE FEED: SUIT</span>
+</div>
+<div class="absolute bottom-4 left-4 right-4">
+<p class="text-label-caps text-[10px] text-on-surface">AR 3241 ACTIVE REGION</p>
+<p class="text-[9px] text-on-surface-variant">0.3-1.5 ÅNGSTRÖMS</p>
+</div>
+</div>
+</aside>
+</div>
+</main>
+<script>
+        // Update UTC Clock
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toISOString().split('T')[1].split('.')[0];
+            document.getElementById('utc-clock').textContent = `UTC ${timeStr}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Interaction for chart simulation
+        document.querySelectorAll('section').forEach(section => {
+            section.addEventListener('mousemove', (e) => {
+                // Potential for adding a crosshair/tooltip here
+            });
+        });
+    </script>
+</body></html>

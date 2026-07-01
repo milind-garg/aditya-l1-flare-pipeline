@@ -1,0 +1,11 @@
+nowcast:
+  background_window_minutes: 120
+  background_percentile: 10
+  threshold_k_soft: 4.0
+  threshold_k_hard: 4.0
+  min_event_duration_minutes: 1
+  merge_gap_minutes: 2
+  fusion_tolerance_minutes: 2
+  min_absolute_flux_soft: 1.0
+  min_absolute_flux_hard: 0.5
+  decay_fraction: 0.5

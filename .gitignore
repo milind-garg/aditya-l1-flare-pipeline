@@ -1,0 +1,25 @@
+# Environments
+venv/
+env/
+.env
+.venv
+__pypackages__/
+
+# Frontend
+frontend/node_modules/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Data and Models
+data/raw/
+data/processed/
+*.zip
+*.pkl
+*.csv
+
+# OS
+.DS_Store
