@@ -12,6 +12,7 @@ import {
 import type { FlareEvent } from "../api/client";
 import { pollIngest, getIngestStatus } from "../api/client";
 import type { IngestStatusResponse } from "../api/client";
+import SolarGlobe from "./SolarGlobe";
 
 
 interface GaugeForecast {
@@ -518,22 +519,16 @@ export default function MonitorView({
                 </div>
               </div>
 
-              {/* Live Sun Feed */}
-              <div className="flex-1 glass-panel rounded-lg overflow-hidden relative group min-h-[180px]">
+              {/* Live Sun Feed (3D Solar Globe) */}
+              <div className="flex-1 glass-panel rounded-lg overflow-hidden relative group min-h-[180px] flex flex-col justify-between">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  {/* Sun visualization */}
-                  <img 
-                    src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_512_0304.jpg" 
-                    alt="Live Sun" 
-                    className="w-full h-full object-cover opacity-70 mix-blend-screen"
-                  />
+                  <SolarGlobe />
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent pointer-events-none z-10" />
-                <div className="absolute top-3 left-3 flex items-center gap-2 z-20">
+                <div className="absolute top-3 left-3 flex items-center gap-2 z-20 pointer-events-none">
                   <span className="w-2 h-2 rounded-full bg-flare-x animate-pulse" />
                   <span className="text-label-caps" style={{ fontSize: "9px", fontWeight: 700, color: "#ef4444" }}>LIVE FEED: SUIT</span>
                 </div>
-                <div className="absolute bottom-3 left-3 right-3 z-20">
+                <div className="absolute bottom-3 left-3 right-3 z-20 pointer-events-none">
                   <p className="text-label-caps" style={{ fontSize: "9px", color: "#e5e2e3" }}>AR 3241 ACTIVE REGION</p>
                   <p style={{ fontSize: "9px", color: "#909096", fontFamily: "JetBrains Mono" }}>0.3–1.5 ÅNGSTRÖMS</p>
                 </div>
