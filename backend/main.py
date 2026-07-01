@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 import os
-from backend.routers import timeseries, flares, forecast, replay, evaluation
+from backend.routers import timeseries, flares, forecast, replay, evaluation, alerts
 
 
 @asynccontextmanager
@@ -30,6 +30,7 @@ app.include_router(flares.router, prefix="/api")
 app.include_router(forecast.router, prefix="/api")
 app.include_router(replay.router, prefix="/api")
 app.include_router(evaluation.router, prefix="/api")
+app.include_router(alerts.router, prefix="/api")
 
 @app.get("/health")
 async def health_check():

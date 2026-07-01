@@ -1,0 +1,8 @@
+{
+  "threshold_probability": 0.05,
+  "discord_webhook_url": "",
+  "slack_webhook_url": "",
+  "email_receiver": "",
+  "email_enabled": false,
+  "sms_enabled": false
+}

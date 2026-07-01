@@ -125,4 +125,59 @@ export async function getIngestStatus(): Promise<IngestStatusResponse> {
   return res.json();
 }
 
+export interface AlertConfig {
+  threshold_probability: number;
+  discord_webhook_url: string;
+  slack_webhook_url: string;
+  email_receiver: string;
+  email_enabled: boolean;
+  sms_enabled: boolean;
+}
+
+export interface TriggeredAlert {
+  id: string;
+  timestamp: string;
+  flare_class: string;
+  probability: number;
+  horizon: string;
+  status: string;
+  slack_sent: boolean;
+  discord_sent: boolean;
+}
+
+export async function getAlertConfig(): Promise<AlertConfig> {
+  const res = await fetch(`${API_BASE}/alerts/config`);
+  if (!res.ok) throw new Error(`Failed to load alerting config: ${res.statusText}`);
+  return res.json();
+}
+
+export async function saveAlertConfig(config: AlertConfig): Promise<{ success: boolean; message: string }> {
+  const res = await fetch(`${API_BASE}/alerts/config`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(config),
+  });
+  if (!res.ok) throw new Error(`Failed to save alerting config: ${res.statusText}`);
+  return res.json();
+}
+
+export async function getAlertHistory(): Promise<TriggeredAlert[]> {
+  const res = await fetch(`${API_BASE}/alerts/history`);
+  if (!res.ok) throw new Error(`Failed to load alert history: ${res.statusText}`);
+  return res.json();
+}
+
+export async function testWebhook(webhookType: string, url: string): Promise<{ success: boolean; message: string }> {
+  const res = await fetch(`${API_BASE}/alerts/test`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ webhook_type: webhookType, url }),
+  });
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(errData.detail || `Failed to send test alert`);
+  }
+  return res.json();
+}
+
 export type { TimeSeriesData, FlareEvent, FlareResponse, ForecastResponse, EvaluationResponse };

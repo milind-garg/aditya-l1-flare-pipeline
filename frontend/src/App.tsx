@@ -10,10 +10,11 @@ import type { FlareEvent, EvaluationResponse } from "./api/client";
 import MonitorView from "./components/MonitorView";
 import CatalogueView from "./components/CatalogueView";
 import EvaluationView from "./components/EvaluationView";
+import AlertingView from "./components/AlertingView";
 import AppShell from "./components/AppShell";
 import "./App.css";
 
-type Tab = "monitor" | "catalogue" | "evaluation";
+type Tab = "monitor" | "catalogue" | "evaluation" | "alerts";
 
 interface ReplayState {
   isPlaying: boolean;
@@ -313,6 +314,10 @@ function App() {
               metrics={evaluationMetrics}
               isLoading={isLoadingEvaluation}
             />
+          )}
+
+          {activeTab === "alerts" && (
+            <AlertingView />
           )}
         </>
       )}

@@ -65,6 +65,45 @@ def run_pipeline() -> dict:
             "alerts_30min": int(scores_df["alert_30min"].sum())
         }
 
+        # Step 4.5: Check and dispatch Space Weather Alerts
+        try:
+            from src.alerting.alert_sender import send_alert_notifications, load_alert_config
+            config = load_alert_config()
+            threshold = config.get("threshold_probability", 0.50)
+            
+            # Find all rows crossing the threshold
+            crossing_rows = scores_df[
+                (scores_df["probability_15min"] >= threshold) | 
+                (scores_df["probability_30min"] >= threshold)
+            ]
+            
+            if not crossing_rows.empty:
+                # Select the latest crossing row to report
+                latest_row = crossing_rows.iloc[-1]
+                latest_prob_15 = float(latest_row["probability_15min"])
+                latest_prob_30 = float(latest_row["probability_30min"])
+                max_prob = max(latest_prob_15, latest_prob_30)
+                
+                # Classify based on probability strength
+                flare_class = "X" if max_prob >= 0.70 else "M" if max_prob >= 0.35 else "C"
+                timestamp_str = str(latest_row["timestamp"])
+                horizon = "15 minutes" if latest_prob_15 >= latest_prob_30 else "30 minutes"
+                
+                print(f"\n[Alerter] Forecast probability {max_prob:.2f} crosses threshold {threshold:.2f}!")
+                print(f"[Alerter] Dispatching space weather alerts for {flare_class}-Class warning...")
+                
+                alert_res = send_alert_notifications(
+                    flare_class=flare_class,
+                    probability=max_prob,
+                    timestamp=timestamp_str,
+                    horizon=horizon
+                )
+                print(f"[Alerter] Dispatch Status: {alert_res['status']}")
+            else:
+                print(f"\n[Alerter] No forecast probabilities cross the threshold of {threshold:.2f}.")
+        except Exception as ae:
+            print(f"\n[Alerter] Failed to process alerts: {ae}")
+
         # Step 5: Update Evaluation Metrics
         print("\n[Step 5/5] Re-evaluating pipeline performance metrics...")
         metrics = evaluate_model()

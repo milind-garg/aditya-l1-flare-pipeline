@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import SystemConfigModal from "./SystemConfigModal";
 
-type Tab = "monitor" | "catalogue" | "evaluation";
+type Tab = "monitor" | "catalogue" | "evaluation" | "alerts";
 
 interface AppShellProps {
   children: ReactNode;
@@ -84,6 +84,18 @@ export default function AppShell({ children, activeTab, setActiveTab, utcTime }:
             >
               <span className="material-symbols-outlined text-lg">analytics</span>
               <span>Model Evaluation</span>
+            </button>
+            
+            <button 
+              onClick={() => setActiveTab("alerts")}
+              className={`w-full flex items-center gap-4 px-6 py-3 transition-colors font-label-caps text-label-caps ${
+                activeTab === "alerts" 
+                  ? "text-primary border-r-2 border-primary bg-primary-container/10" 
+                  : "text-on-surface-variant hover:bg-white/5 hover:text-on-surface"
+              }`}
+            >
+              <span className="material-symbols-outlined text-lg">notifications_active</span>
+              <span>Space Weather Alerts</span>
             </button>
           </nav>
           
